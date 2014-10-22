@@ -1,7 +1,7 @@
-README
-------
+ansible puppet inventory
+------------------------
 
-This repository is meant to share my ansible plugin which provides a dynamic ansible inventory based on you puppet environment through puppetdb.
+This repository is meant to share an ansible plugin which provides a dynamic ansible inventory based on your puppet environment through puppetdb.
 
 ### environments
 
@@ -9,21 +9,42 @@ In the environments directory you can find a puppetdb query for each environment
 
 ### puppetdb.sh
 
-This is the actual script wich will call the puppetdb api to dynamically lookup for the nodes in your environment which you can use in ansible
+This is the actual script wich will call the puppetdb api to dynamically lookup for the nodes in your puppet environments to be used in ansible.
 
 ### ansible
 
-There are different ways to configure your ansible environment to use this dynamic inventory script
+You should adapt the environments/files to your needs, rename the files to your puppet environments and adapt them so they reflect your catalog-environments. Then copy them over to your ansible root directory:
+
+```bash
+  $ sudo cp -R environments /etc/ansible
+```
+
+There are different ways to configure your ansible environment to use this dynamic inventory script.
 
 You could copy it over to /etc/ansible/hosts:
+
 ```bash
-  $ cp puppetdb.sh /etc/ansible/hosts
+  $ sudo cp puppetdb.sh /etc/ansible/hosts
 ```
 Or you could use the -i inventory parameter:
+
 ```bash
   $ ansible -i puppetdb.sh
 ```
 ### examples
+
+When replaced hosts file:
+
 ```bash
-  $ ansible development -i puppetdb.sh -a 'whoami' --sudo -K
+  $ ansible development -a 'whoami' --sudo -K --list-hosts
 ```
+
+Using the --inventory option
+
+```bash
+  $ ansible development -i puppetdb.sh -a 'whoami' --sudo -K --list-hosts
+```
+
+### source
+
+[codecentric.de](https://blog.codecentric.de/en/2014/09/use-ansible-remote-executor-puppet-environment/)
