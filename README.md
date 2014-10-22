@@ -9,7 +9,7 @@ In the environments directory you can find a puppetdb query for each environment
 
 ### puppetdb.sh
 
-This is the actual script wich will call the puppetdb api to dynamically lookup for the nodes in your puppet environments to be used in ansible.
+This is the actual script which will call the puppetdb api to dynamically lookup for the nodes in your puppet environments to be used in ansible.
 
 ### ansible
 
