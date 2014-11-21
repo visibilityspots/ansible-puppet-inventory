@@ -1,4 +1,13 @@
 #!/usr/bin/env python2
+#
+# Ansible inventory script based on puppetdb.
+#
+# Author: Jan Collijs
+# Source: https://github.com/visibilityspots/ansible-puppet-inventory
+
+# If you want to use the api version 4 you have to install the pypuppetdb
+# library made by https://github.com/NeCTAR-RC/pypuppetdb from source untill
+# it got merged https://github.com/puppet-community/pypuppetdb/pull/34
 
 import sys
 import os
@@ -10,6 +19,7 @@ try:
 except:
         import simplejson as json
 
+''' This class will generate a list of nodes based on puppetdb '''
 class PuppetDBInventory():
     def __init__(self):
         self.inventory = {}
@@ -23,6 +33,7 @@ class PuppetDBInventory():
 
             print json.dumps(data)
 
+    ''' Getting the settings out of the puppetdb.ini file '''
     def read_settings(self):
         config = ConfigParser.SafeConfigParser()
         puppetdb_default_ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'puppetdb.ini')
@@ -52,12 +63,14 @@ class PuppetDBInventory():
         else:
             raise ValueError('puppetdb.ini does not have a server - environments param defined')
 
+    ''' Parsing the parameters given through the commond line '''
     def parse_cli_args(self):
         parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on puppetdb')
         parser.add_argument('--list', action='store_true', default=True,
                            help='List instances (default: True)')
         self.args = parser.parse_args()
 
+    ''' Getting all the nodes out of puppetdb based on the api version 3 '''
     def get_host_list(self):
         db = connect(api_version=3, host=self.puppetdb_server, port=self.puppetdb_server_port)
         nodes = db.nodes()
@@ -67,6 +80,7 @@ class PuppetDBInventory():
 
         return inv
 
+    ''' Getting the nodes out of puppetdb based on the expirimental api 4 based on environments '''
     def get_host_list_based_on_environments(self):
         db = connect(api_version=4, host=self.puppetdb_server, port=self.puppetdb_server_port)
         json_data_toReturn = ''
@@ -80,6 +94,7 @@ class PuppetDBInventory():
 
         return inv
 
+''' Main class which initiates the whole script'''
 def main():
     PuppetDBInventory()
 
