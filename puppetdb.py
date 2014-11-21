@@ -12,6 +12,7 @@ except:
 
 class PuppetDBInventory():
     def __init__(self):
+        self.inventory = {}
         self.read_settings()
         self.parse_cli_args()
         if self.args.list:
@@ -60,22 +61,24 @@ class PuppetDBInventory():
     def get_host_list(self):
         db = connect(api_version=3, host=self.puppetdb_server, port=self.puppetdb_server_port)
         nodes = db.nodes()
-        nodes_list = []
+        inv = { 'all': []}
         for node in nodes:
-            nodes_list.append(node.name)
-        return { 'all': nodes_list}
+            inv['all'].append(node.name)
+
+        return inv
 
     def get_host_list_based_on_environments(self):
         db = connect(api_version=4, host=self.puppetdb_server, port=self.puppetdb_server_port)
-        json_data_toReturn = []
+        json_data_toReturn = ''
+        inv = {}
         for env in self.puppetdb_environments:
-            nodes_list = []
+            inv.update( { env: [] })
+
             facts = db.facts('fqdn', environment=env)
             for fact in facts:
-                nodes_list.append(fact.value)
-            json_data_toReturn.append( { env: nodes_list} )
+                inv[env].append(fact.value)
 
-        return json_data_toReturn
+        return inv
 
 def main():
     PuppetDBInventory()
